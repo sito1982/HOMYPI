@@ -9,7 +9,7 @@
 	</parent>
 	<packaging>war</packaging>
 	<properties>
-		<javaJDK>C:\Program Files\Java\jdk1.8.0_65\bin\javac.exe</javaJDK>
+		<javaJDK>/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/bin/javac</javaJDK>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<version.jdk>1.8</version.jdk>  <!-- 1.7 for JDK 7 -->
