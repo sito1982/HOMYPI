@@ -42,7 +42,7 @@ public class HomyPiRestService {
 	}
 	
 	@GET
-	@Path("/verify")
+	@Path("/serial")
 	public String getSerial(){
 		
 		return SerialRaspberryController.getSalidaSerial(); 
