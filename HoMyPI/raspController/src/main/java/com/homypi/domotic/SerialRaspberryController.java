@@ -33,10 +33,10 @@ public class SerialRaspberryController implements SerialPortEventListener {
 
 		private static final String PORT_NAMES[] = { 
 //	        "/dev/tty.usbmodem", // Mac OS X
-	        "/dev/usbdev", // Linux
+//	        "/dev/usbdev", // Linux
 	        "/dev/tty", // Linux
-	        "/dev/serial", // Linux
-	        "COM3", // Windows
+//	        "/dev/serial", // Linux
+//	        "COM3", // Windows
 	    };
 	    
 	    private String appName;
@@ -96,6 +96,7 @@ public class SerialRaspberryController implements SerialPortEventListener {
 	        }
 	        catch ( Exception e ) { 
 	            e.printStackTrace();
+	            close();
 	        }
 	        return false;
 	    }
