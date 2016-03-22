@@ -9,7 +9,7 @@
 	</parent>
 	<packaging>war</packaging>
 	<properties>
-		<javaJDK>/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/bin/javac</javaJDK>
+		<javaJDK>C:\Program Files\Java\jdk1.8.0_65\bin\javac.exe</javaJDK>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<version.jdk>1.8</version.jdk>  <!-- 1.7 for JDK 7 -->
@@ -69,6 +69,12 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>2.11.4</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+		</dependency>
+
 		<!-- if you are using Jersey client specific features -->
 		<!-- <dependency> <groupId>org.glassfish.jersey.core</groupId> <artifactId>jersey-client</artifactId> 
 			<version>${version.jersey}</version> </dependency> -->

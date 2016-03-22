@@ -42,10 +42,43 @@ public class HomyPiRestService {
 	}
 	
 	@GET
-	@Path("/serial")
-	public String getSerial(){
+	@Path("/consumo")
+	public String getConsumo(){
 		
-		return SerialRaspberryController.getSalidaSerial(); 
+		String consumo = SerialRaspberryController.getConsumo();
+		if(consumo != null && !consumo.equals("")){
+			MongoDBSingleton dbSingleton = MongoDBSingleton.getInstance();
+			DB db = dbSingleton.getTestdb();
+			DBCollection coll = db.getCollection("Consumo"); 
+			BasicDBObject doc = new BasicDBObject("concumo", consumo).append("time", new Date());
+			coll.insert(doc);			
+		}
+		
+		return consumo; 
+		
+	}
+	
+	@GET
+	@Path("/temperatura")
+	public String getTemperatura(){
+		String temperatura =SerialRaspberryController.getTemperatura();
+		
+		if (temperatura.indexOf("|") != -1){
+			String humedad = temperatura.substring(0,temperatura.indexOf("|"));
+			temperatura = temperatura.substring(temperatura.indexOf("|")+1,temperatura.length());
+			
+			if(temperatura != null && !temperatura.equals("")){
+				MongoDBSingleton dbSingleton = MongoDBSingleton.getInstance();
+				DB db = dbSingleton.getTestdb();
+				DBCollection coll = db.getCollection("temperatura"); 
+				BasicDBObject doc = new BasicDBObject("temperatura", temperatura).append("time", new Date()).append("humedad", humedad);
+				coll.insert(doc);
+			}
+			
+		}
+		
+		return temperatura; 
+		
 		
 	}
 

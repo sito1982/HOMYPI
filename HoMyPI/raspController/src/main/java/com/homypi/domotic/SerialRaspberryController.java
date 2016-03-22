@@ -14,16 +14,26 @@ import gnu.io.SerialPortEventListener;
 public class SerialRaspberryController implements SerialPortEventListener {
 	
 	
+	private static final String GET_CONSUMO = "c";
+	private static final String GET_TEMPERATURA = "t";
+	private static final String ENCENDER = "y";
+	private static final String APAGAR= "n";
+	
+	
 	 SerialPort serialPort = null;
 	 private static String salidaSerial="";
 	 
 	 
 	 
 
+//	public static String getSalidaSerial() {
+//		SerialRaspberryController test = new SerialRaspberryController();
+//		test.initialize();
+//		test.close();		
+//		return salidaSerial;
+//	}
+
 	public static String getSalidaSerial() {
-		SerialRaspberryController test = new SerialRaspberryController();
-		test.initialize();
-		test.close();		
 		return salidaSerial;
 	}
 
@@ -34,9 +44,9 @@ public class SerialRaspberryController implements SerialPortEventListener {
 		private static final String PORT_NAMES[] = { 
 //	        "/dev/tty.usbmodem", // Mac OS X
 //	        "/dev/usbdev", // Linux
-	        "/dev/tty", // Linux
+//	        "/dev/tty", // Linux
 //	        "/dev/serial", // Linux
-//	        "COM3", // Windows
+	        "COM3", // Windows
 	    };
 	    
 	    private String appName;
@@ -155,12 +165,45 @@ public class SerialRaspberryController implements SerialPortEventListener {
 	        appName = getClass().getName();
 	    }
 	    
-	    
+	public static String getConsumo(){
+		return genericSerialRequest(GET_CONSUMO);
+	}
+	
+	public static String getTemperatura(){
+		return genericSerialRequest(GET_TEMPERATURA);
+	}
+	
+	public static String encenderCalefaccion(){
+		return genericSerialRequest(ENCENDER);
+	}
+	
+	public static String apagarCalefaccion(){
+		return genericSerialRequest(APAGAR);
+	}
+	
+	
+	public static String genericSerialRequest(String request){
+		SerialRaspberryController controller = new SerialRaspberryController();
+		if (controller.initialize()) {			
+			
+			controller.sendData(request);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		controller.close();
+		
+		return getSalidaSerial();
+		
+	}
 	    
 	public static void main(String[] args) throws Exception {
 		SerialRaspberryController test = new SerialRaspberryController();
 		if (test.initialize()) {			
-			while (true) {
+			
 				test.sendData("y");
 				try {
 					Thread.sleep(2000);
@@ -172,7 +215,7 @@ public class SerialRaspberryController implements SerialPortEventListener {
 				} catch (InterruptedException ie) {
 				}
 
-			}
+			
 		}		
 	}
 	
