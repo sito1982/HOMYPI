@@ -14,10 +14,10 @@ import gnu.io.SerialPortEventListener;
 public class SerialRaspberryController implements SerialPortEventListener {
 	
 	
-	private static final String GET_CONSUMO = "c";
-	private static final String GET_TEMPERATURA = "t";
-	private static final String ENCENDER = "y";
-	private static final String APAGAR= "n";
+	public static final String GET_CONSUMO = "c";
+	public static final String GET_TEMPERATURA = "t";
+	public static final String ENCENDER = "y";
+	public static final String APAGAR= "n";
 	
 	
 	 SerialPort serialPort = null;
@@ -200,24 +200,24 @@ public class SerialRaspberryController implements SerialPortEventListener {
 		
 	}
 	    
-	public static void main(String[] args) throws Exception {
-		SerialRaspberryController test = new SerialRaspberryController();
-		if (test.initialize()) {			
-			
-				test.sendData("y");
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException ie) {
-				}
-				test.sendData("n");
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException ie) {
-				}
+	public static void main(String[] args) {
 
-			
-		}		
+		if (args.length == 1) {
+			SerialRaspberryController test = new SerialRaspberryController();
+			String accion = args[0];
+
+			if (accion.equals(APAGAR)) {
+				genericSerialRequest(APAGAR);
+			}
+			if (accion.equals(ENCENDER)) {
+				genericSerialRequest(ENCENDER);
+			}
+			if (accion.equals(GET_CONSUMO)) {
+				genericSerialRequest(GET_CONSUMO);
+			}
+			if (accion.equals(GET_TEMPERATURA)) {
+				genericSerialRequest(GET_TEMPERATURA);
+			}
+		}
 	}
-	
-
 }
