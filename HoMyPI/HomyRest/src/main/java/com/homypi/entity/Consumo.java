@@ -2,12 +2,16 @@ package com.homypi.entity;
 
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 
-@XmlRootElement()  
+
+@Document(collection = "Consumo")
 public class Consumo {
 	
+	@Id
+	private String id;
 	
 	public long consumo;
 	public Date time;
@@ -23,6 +27,12 @@ public class Consumo {
 	}
 	public void setTime(Date time) {
 		this.time = time;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 	

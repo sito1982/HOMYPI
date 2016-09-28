@@ -1,85 +1,90 @@
 package com.homypi.services;
 
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.homypi.domotic.SerialRaspberryController;
 import com.homypi.entity.Consumo;
-import com.homypi.persistance.MongoDBSingleton;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
+import com.homypi.persistance.consumo.ConsumoRepository;
+import com.homypi.utils.DateUtils;
 
-@Path("/message")
+@SpringBootApplication
+@RestController
+@ImportResource(locations = { "classpath*:spring-homy.xml" })
+@EnableAutoConfiguration
 public class HomyPiRestService {
 
-	@GET
-	@Path("/verify")
-	public String verifyRESTService(InputStream incomingData) {
-		System.out.println("RESTful Service 'MessageService' is running ==> ping");
-		return "received ping on " + new Date().toString();
-	}
-
-	@POST
-	@Path("/consumo")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String addConsumo(Consumo concumo) {
-
-		System.out.println(concumo.getConsumo());
-		MongoDBSingleton dbSingleton = MongoDBSingleton.getInstance();
-		DB db = dbSingleton.getTestdb();
-		DBCollection coll = db.getCollection("Consumo"); 
-		BasicDBObject doc = new BasicDBObject("concumo", concumo.getConsumo()).append("time", concumo.getTime());
-		coll.insert(doc);
-		
-		return "looool";
-	}
+	@Autowired
+	ConsumoRepository consumoRepository;
 	
-	@GET
-	@Path("/consumo")
-	public String getConsumo(){
-		
-		String consumo = SerialRaspberryController.getConsumo();
-		if(consumo != null && !consumo.equals("")){
-			MongoDBSingleton dbSingleton = MongoDBSingleton.getInstance();
-			DB db = dbSingleton.getTestdb();
-			DBCollection coll = db.getCollection("Consumo"); 
-			BasicDBObject doc = new BasicDBObject("concumo", consumo).append("time", new Date());
-			coll.insert(doc);			
-		}
-		
-		return consumo; 
-		
-	}
-	
-	@GET
-	@Path("/temperatura")
-	public String getTemperatura(){
-		String temperatura =SerialRaspberryController.getTemperatura();
-		
-		if (temperatura.indexOf("|") != -1){
-			String humedad = temperatura.substring(0,temperatura.indexOf("|"));
-			temperatura = temperatura.substring(temperatura.indexOf("|")+1,temperatura.length());
-			
-			if(temperatura != null && !temperatura.equals("")){
-				MongoDBSingleton dbSingleton = MongoDBSingleton.getInstance();
-				DB db = dbSingleton.getTestdb();
-				DBCollection coll = db.getCollection("temperatura"); 
-				BasicDBObject doc = new BasicDBObject("temperatura", temperatura).append("time", new Date()).append("humedad", humedad);
-				coll.insert(doc);
+	@Autowired
+	MongoTemplate mongoTemplate;
+
+	@RequestMapping(path = "/consumo", method = RequestMethod.GET)
+	public @ResponseBody ArrayList<Consumo> getConsumo(@RequestParam(required = false, value = "desde") String desde,
+			@RequestParam(required = false, value = "hasta") String hasta) {
+
+		ArrayList<Consumo> listaConsumo = new ArrayList<Consumo>();
+
+		if (!StringUtils.isEmpty(desde)) {
+			if (!StringUtils.isEmpty(hasta)) {
+				listaConsumo = consumoRepository.findConsumoByDateDesdeHasta(DateUtils.formatingDate(desde), DateUtils.formatingDate(hasta));
+
+			} else {
+				listaConsumo = consumoRepository.findConsumoByDateDesdeHasta(DateUtils.formatingDate(desde), new Date());
 			}
+
+		} else {
 			
+			Query query = new Query();
+			query.limit(1);
+			query.with(new Sort(Sort.Direction.DESC,"time"));
+			mongoTemplate.find(query, Consumo.class);
+			listaConsumo.add(mongoTemplate.find(query, Consumo.class).get(0));
+
 		}
-		
-		return temperatura; 
-		
-		
+
+		return listaConsumo;
+	}
+
+	@RequestMapping("/temperatura")
+	public String getTemperatura() {
+		String temperatura = SerialRaspberryController.getTemperatura();
+		return temperatura;
+
+	}
+
+	@RequestMapping("/calefaccion/encender")
+	public String encenderCalefaccion() {
+		String contestacion = SerialRaspberryController.encenderCalefaccion();
+		return contestacion;
+
+	}
+
+	@RequestMapping("/calefaccion/apagar")
+	public String apagarCalefaccion() {
+		String contestacion = SerialRaspberryController.apagarCalefaccion();
+		return contestacion;
+
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(HomyPiRestService.class, args);
 	}
 
 }
